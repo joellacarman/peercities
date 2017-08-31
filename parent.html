@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parent Page</title>
+</head>
+<body>
+
+  <!-- Pym will make your iframe here in this div -->
+  <div id="future-home-of-pyms-iframe"></div>
+
+  <!-- only link to Pym source once per page, no matter # of iframes -->
+  <script src="https://pym.nprapps.org/pym.v1.js" type="text/javascript"></script>
+  <script>
+                          //tell Pym the name of your iframe container div and the URL of the page being framed in
+      var pymParent = new pym.Parent('future-home-of-pyms-iframe', 'http://localhost:8000/', {});
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+name,variable
+City,city
+Fiscal Base Score,fisc_base_score
+Tax Authority Score,tax_auth_score
+Property Tax Gap,prop_tax_gap
+Demand Score,demand_score
+Cluster Assignment,cluster
+ID,city_num
+Census of Gov Code,census_code
+Latitude,lat
+Longitude,lon

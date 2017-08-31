@@ -1,0 +1,11 @@
+GEO.id,Id
+GEO.id2,Id2
+msa_name,Geography
+HC01_EST_VC01,Owner-occupied housing units with a mortgage; Estimate; Owner-occupied housing units with a mortgage
+HC01_EST_VC10,Owner-occupied housing units with a mortgage; Estimate; VALUE - Median (dollars)
+HC01_EST_VC14,"Owner-occupied housing units with a mortgage; Estimate; MORTGAGE STATUS - With either a second mortgage, or home equity loan, but not both - Second mortgage only"
+HC01_EST_VC15,"Owner-occupied housing units with a mortgage; Estimate; MORTGAGE STATUS - With either a second mortgage, or home equity loan, but not both - Home equity loan only"
+HC01_EST_VC16,Owner-occupied housing units with a mortgage; Estimate; MORTGAGE STATUS - Both second mortgage and home equity loan
+HC01_EST_VC28,Owner-occupied housing units with a mortgage; Estimate; HOUSEHOLD INCOME IN THE PAST 12 MONTHS (IN 2015 INFLATION-ADJUSTED DOLLARS) - Median household income (dollars)
+HC01_EST_VC48,Owner-occupied housing units with a mortgage; Estimate; MONTHLY HOUSING COSTS - Median (dollars)
+HC01_EST_VC78,Owner-occupied housing units with a mortgage; Estimate; REAL ESTATE TAXES - Median (dollars)
