@@ -1,28 +1,37 @@
-//TODO - http://eyeseast.github.io/visible-data/2013/08/26/responsive-d3/
-var margin = {top: 10, left: 10, bottom: 10, right: 10}
-  , width = parseInt(d3.select('#map-container').style('width'))
-  , width = width - margin.left - margin.right
-  , mapRatio = .5
-  , height = width * mapRatio;
+var margin = {top: 10, left: 10, bottom: 10, right: 10},
+  width = parseInt(d3.select("#map-container").style("width")),
+  width = width - margin.left - margin.right,
+  mapRatio = .5,
+  height = width * mapRatio;
 
-var usMap = d3.select("#us-map");
+var usMap = d3.select("#map-container").append("svg")
+              .style("height", height + "px")
+              .style("width", width + "px");
 
 var projection = d3.geoAlbersUsa()
                     .scale(width)
                     .translate([width/2, height/2]);
 var path = d3.geoPath(projection);
+              //purple, yellow, lt blue, green
+var colors = ["#904799", "#ECAA20", "#71A0D5", "#4FC0B0"];
 
-var DEFAULT_GEO = "362077001";
+var strokeColor = "#ABC6E7";
+var peerStroke = "#1E4586";
+
+var initialR = 0.00278,
+    largeR = 0.007,
+    hiliteR = 0.004;
+
+//dataset specific variables
+var PLACE_NAME = "city",
+    PEER_GROUP = "cluster",
+    GEOID = "census_code",
+    DEFAULT_GEO = "362077001";
 
 var NESTED_PEER_GROUPS,
     CITY_DATA,
     TITLES,
     SELECTED_GEOID = DEFAULT_GEO;
-
-//dataset specific names that will change
-var PLACE_NAME = "city",//"msa_name",
-    PEER_GROUP = "cluster",//"peerGroup",
-    GEOID = "census_code"//"GEOid";
 
 d3.queue()
   .defer(d3.csv, "data/city-data.csv")
@@ -46,6 +55,8 @@ function dataReady(error, data, dataTitles, us){
               //could sort here by some other value in the "leaves"
               .sortValues(function(a,b) { return a[PLACE_NAME] > b[PLACE_NAME] } )
               .map(data);
+
+
 
   makeDropDown(data);
   drawMap(us);
@@ -78,14 +89,16 @@ function menuSelected(d){
 }
 
 function drawMap(us){
-  usMap.attr("width", width).attr("height", height);
+  usMap.style("width", width).style("height", height);
 
   usMap.selectAll("path")
     .data(us.features)
     .enter().append("path")
     .attr("d", path)
-    .attr("fill", "#ddd")
-    .attr("stroke", "#fff")
+    .attr("fill", "#FFFFFF")
+    .attr("stroke", "#B4B4B4")
+    .attr("stroke-width", 0.5)
+    .attr("class", "state")
 }
 
 function drawCircles(data){
@@ -101,9 +114,9 @@ function drawCircles(data){
     .attr("id", function(d){ return "n" + d[GEOID]; });
 
   cities.append("circle")
-    .attr("r", width * 0.00278)
-    .style("fill", "#ddd")
-    .style("stroke", "#000")      //have to add letter before ID bc it is all numbers, messes up D3
+    .attr("r", width * initialR)
+    .style("fill", "#FFFFFF")
+    .style("stroke", strokeColor)      //have added letter before ID bc all numbers messes up D3
     .attr("id", function(d){ return "c" + d[GEOID]; })
     .on("click", circleSelected);
 }
@@ -125,19 +138,22 @@ function circleSelected(d,i){
 function showSelectionOnMap(){
   usMap.selectAll("circle")
     .transition()
-      .attr("r", width * 0.002)
-      .style("fill", "#ddd")
-      .style("stroke", "#000");
+      .attr("r", width * initialR)
+      .style("fill", "#FFFFFF")
+      .style("stroke", function(d){ if ( d[PEER_GROUP] ===
+                                        CITY_DATA["$" + SELECTED_GEOID][0][PEER_GROUP] ){
+                                         return peerStroke;
+                                       } else { return strokeColor; } });
 
   usMap.selectAll(".city-name-label")
     .remove();
 
   d3.select("#c" + SELECTED_GEOID).transition()
-      .style("fill", "black")
-      .attr("r", width * 0.007)
+      .style("fill", "#1E4586")
+      .attr("r", width * largeR)
     .transition()
-      .attr("r", width * 0.004)
-      .style("fill", "#000")
+      .attr("r", width * hiliteR)
+      .style("stroke", "#1E4586")
 
   d3.select("#n" + SELECTED_GEOID).append("text")
     .text(function(d){ return d[PLACE_NAME] })
@@ -193,13 +209,40 @@ function makeTable(peerGroup){
       .enter()
       .append("tr");
 
-  //TODO add attr "data-title" to each <td> to work with NPR responsive chart styles
   var cells = rows.selectAll("td")
       .data(function(d){ return d; })
       .enter()
       .append("td")
       .text(function(d){ return d.value; })
       .attr("data-title", function(d){ return d.key });
+
+  pymChild.sendHeight();
+
+}
+
+//responsive map, thanks Chris: http://eyeseast.github.io/visible-data/2013/08/26/responsive-d3/
+d3.select(window).on('resize', resize);
+
+function resize(){
+    width = parseInt(d3.select("#map-container").style("width"));
+    width = width - margin.left - margin.right;
+    height = width * mapRatio;
+
+    // update projection
+    projection
+        .translate([width / 2, height / 2])
+        .scale(width);
+
+    // resize the map container
+    usMap
+        .style("width", width)
+        .style("height", height);
+
+    // resize the map
+    usMap.selectAll(".state").attr("d", path);
+    usMap.selectAll(".city").attr("transform", function(d) {
+      return "translate("+ projection([d.lon, d.lat])+")";
+    })
 
 }
 

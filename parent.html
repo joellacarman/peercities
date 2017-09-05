@@ -3,12 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <title>Parent Page</title>
+  <style type="text/css">
+    .wrapper {
+      margin: 0 auto;
+      width: 750px;
+    }
+
+    @media only screen and (max-width: 767px){
+      .wrapper {
+        width: 94%;
+        margin: 0 auto;
+      }
+    }
+  </style>
 </head>
 <body>
-
-  <!-- Pym will make your iframe here in this div -->
-  <div id="future-home-of-pyms-iframe"></div>
-
+  <div class="wrapper">
+    <!-- Pym will make your iframe here in this div -->
+    <div id="future-home-of-pyms-iframe"></div>
+  </div>
   <!-- only link to Pym source once per page, no matter # of iframes -->
   <script src="https://pym.nprapps.org/pym.v1.js" type="text/javascript"></script>
   <script>

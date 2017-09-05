@@ -5,6 +5,7 @@
       margin: 0;
       padding: 10px;
       font: 12px/1.4 "Gotham", sans-serif;
+      /*height: 1485px;*/
       color: #333;
   }
 
@@ -26,6 +27,7 @@
       color: #666;
       font-size: 11px;
   }
+
   .footnotes p,
   .footer p {
       margin: 2px 0 0 0;
@@ -34,14 +36,45 @@
       color: #808080;
   }
 
+  #legend {
+    float: right;
+  }
+
+  /*Thanks: https://stackoverflow.com/questions/1895476/how-to-style-a-select-dropdown-with-css-only-without-javascript*/
   select {
-    display: block;
+    margin: 50px;
+    border: none;
+    border-radius: 0;
+    border-bottom: 1px solid #BBB;
+    background: transparent;
+  /*  margin-left: 35%;*/
+    font-family: "Gotham", sans-serif;
+    font-size: 18px;
+    height: 34px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: url(https://imageog.flaticon.com/icons/png/512/3/3907.png?size=1200x630f&pad=10,10,10,10&ext=png&bg=FFFFFFFF) 96% / 15% no-repeat;
+  }
+
+
+  /* CAUTION: IE hackery ahead */
+  select::-ms-expand {
+      display: none; /* remove default arrow in IE 10 and 11 */
+  }
+
+  /* target Internet Explorer 9 to undo the custom arrow */
+  @media screen and (min-width:0\0) {
+      select {
+          background:none\9;
+          padding: 5px\9;
+      }
   }
 
   table {
       border-collapse: collapse;
       padding: 0;
-      margin: 0 0 11px 0;
+      margin: 40px 0 11px 0;
       width: 100%;
   }
 
@@ -67,8 +100,7 @@
       font-weight: bold;
   }
 
-  /*steal this smart stuff*/
-  /* responsive table */
+  /* responsive table styles borrowed from basic embed example: http://blog.apps.npr.org/pym.js/; */
   @media screen and (max-width: 480px) {
       table,
       tbody {
