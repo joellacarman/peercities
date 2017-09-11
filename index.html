@@ -6,32 +6,47 @@
   <title>Peer Cities</title>
 </head>
 <body>
-  <h1>Find Cities Like Yours</h1>
+  <h1>City Fiscal Dashboard</h1>
+  <h2>Find your fiscal peers</h2>
   <p>
-    Discovering cities with a similar financial situation to your own can be a great aid for planning.
-    For a selection of 100 cities across the United States, we've made it easy to do just that by
-    clustering them into four groups based on the following factors: x, y, z.  These clusters reveal...
+    How city leaders confront revenue and spending decisions is influenced by the financial, economic
+    and political variables at work in their communities. Cities that have similar abilities to adjust
+    property or income taxes will have more in common on financial matters than cities that are alike
+    in other ways, like population or geography. But knowing which cities share a similar financial
+    ecosystem can be difficult.
   </p>
   <p>
-    For more insight into city profiles, we've created four index values of financial wellbeing:
+    To help city leaders identify their financial “peers” and benchmark their own progress, we’ve used
+    the <a href="http://fiscalpolicyspace.greatcities.uic.edu/">Fiscal Policy Space (FPS)</a> framework
+    devised by the College of Urban Planning and Public Affairs at the University of Illinois at Chicago
+    to analyze 100 cities across four factors:
     <ul>
-      <li><b>Fiscal Base Score</b> This measures...</li>
-      <li><b>Tax Authority Score</b> This measures...</li>
-      <li><b>Property Tax Gap</b> This measures...</li>
-      <li><b>Demand Score</b> This measures...</li>
+      <li><b>Fiscal Base Score</b> indicates a city’s revenue capacity and is based on the average of
+      property, sales and income tax collections per capita</li>
+      <li><b>Tax Authority Score</b> shows a city’s ability to collect tax revenue per state statute
+      and as demonstrated by the type or types of taxes a city collects (property, sales, and income
+      tax)</li>
+      <li><b>Property Tax Gap</b> is a ratio describing how much a city uses property tax as a source
+      of revenue by comparing the maximum property tax revenue state statute allows to the actual
+      amount collected</li>
+      <li><b>Demand Score</b> rates a city’s demand for local government services and political culture
+      based on the average of income, political ideology and public sector unionization</li>
     </ul>
+  </p>
+  <p>
+    Using a cluster analysis, we’ve formed four peer groups to facilitate fiscal benchmarking. Use the
+    map below to see how your city compares.
   </p>
   <select id="dropdown"></select>
   <div id="map-container"></div>
-  <svg id="legend" style="height: 20px; width: 130px">
-    <circle cx="10" cy="10" r="1.9" style="fill: rgb(255, 255, 255); stroke: rgb(171, 198, 231)"></circle>
-    <text x="15" y="13">City</text>
-    <circle cx="60" cy="10" r="1.9" style="fill: rgb(255, 255, 255); stroke: rgb(30, 69, 134)"></circle>
-    <text x="65" y="13">Peer City</text>
+  <svg id="legend" style="height: 100px; width: 250px">
+    <circle cx="6" cy="75" r="4.9" style="fill: rgb(160, 216, 209); stroke: rgb(255, 255, 255)"></circle>
+    <text x="20" y="80">City</text>
+    <circle cx="76" cy="75" r="4.9" style="fill: rgb(236, 170, 32); stroke: rgb(255, 255, 255)"></circle>
+    <text x="90" y="80">Peer City</text>
   </svg>
-<!-- link to pym again here -->
+  <p><a href="data/Dashboard_8.17.17_addcluster.xlsx" target="_blank">Download Our Data</a></p>
 <script src="https://pym.nprapps.org/pym.v1.js" type="text/javascript"></script>
-<!-- hi Pym, there is a child! -->
 <script>var pymChild = new pym.Child();</script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
 <script src="node_modules/d3/build/d3.js"></script>

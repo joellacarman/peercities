@@ -11,22 +11,33 @@ var usMap = d3.select("#map-container").append("svg")
 var projection = d3.geoAlbersUsa()
                     .scale(width)
                     .translate([width/2, height/2]);
+
 var path = d3.geoPath(projection);
+
+var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
               //purple, yellow, lt blue, green
 var colors = ["#904799", "#ECAA20", "#71A0D5", "#4FC0B0"];
 
-var strokeColor = "#ABC6E7";
-var peerStroke = "#1E4586";
+var cityColor = "#4FC0B0",
+    peerCityColor = "#ECAA20",
+    nlcBlue = "#2559A9",
+    gray = "#E6E6E5",
+    hilite = "#FBEED2",
+    lightblue = "#EEF4FA";
 
-var initialR = 0.00278,
-    largeR = 0.007,
-    hiliteR = 0.004;
+var initialR = 0.0055,
+    largeR = 0.014,
+    hiliteR = 0.01;
 
 //dataset specific variables
 var PLACE_NAME = "city",
     PEER_GROUP = "cluster",
     GEOID = "census_code",
-    DEFAULT_GEO = "362077001";
+    DEFAULT_GEO = "362077001",
+    SORT_THING = PLACE_NAME;
 
 var NESTED_PEER_GROUPS,
     CITY_DATA,
@@ -52,11 +63,10 @@ function dataReady(error, data, dataTitles, us){
 
   NESTED_PEER_GROUPS = d3.nest()
               .key(function(d){ return d[PEER_GROUP]; })
-              //could sort here by some other value in the "leaves"
-              .sortValues(function(a,b) { return a[PLACE_NAME] > b[PLACE_NAME] } )
+              //could sort here by some other value in the "leaves" http://bl.ocks.org/phoebebright/raw/3176159/
+              .sortValues(function(a,b) { return ((a[PLACE_NAME] < b[PLACE_NAME])
+                                          ? -1 : 1); return 0;} )
               .map(data);
-
-
 
   makeDropDown(data);
   drawMap(us);
@@ -89,15 +99,14 @@ function menuSelected(d){
 }
 
 function drawMap(us){
-  usMap.style("width", width).style("height", height);
+  //usMap.style("width", width).style("height", height);
 
   usMap.selectAll("path")
     .data(us.features)
     .enter().append("path")
     .attr("d", path)
-    .attr("fill", "#FFFFFF")
-    .attr("stroke", "#B4B4B4")
-    .attr("stroke-width", 0.5)
+    .attr("fill", lightblue)
+    .attr("stroke", nlcBlue)
     .attr("class", "state")
 }
 
@@ -111,16 +120,29 @@ function drawCircles(data){
       return "translate("+ projection([d.lon, d.lat])+')';
     })
     .attr("class", "city")
-    .attr("id", function(d){ return "n" + d[GEOID]; });
+    .attr("id", function(d){ return "n" + d[GEOID]; })
+    .on("mouseover", function(d) {
+      tooltip.transition()
+          .duration(200)
+          .style("opacity", 1);
+      tooltip.html( d[PLACE_NAME] )
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 40) + "px");
+      })
+    .on("mouseout", function(d) {
+        tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+    });;
 
   cities.append("circle")
     .attr("r", width * initialR)
-    .style("fill", "#FFFFFF")
-    .style("stroke", strokeColor)      //have added letter before ID bc all numbers messes up D3
+    .style("fill", cityColor)      //have added letter before ID bc all numbers messes up D3
+    .style("stroke", "#FFFFFF")
     .attr("id", function(d){ return "c" + d[GEOID]; })
-    .on("click", circleSelected);
-}
+    .on("click", circleSelected)
 
+}
 
 function circleSelected(d,i){
   SELECTED_GEOID = d[GEOID];
@@ -136,31 +158,46 @@ function circleSelected(d,i){
 }
 
 function showSelectionOnMap(){
+  tooltip.transition()
+          .duration(100)
+          .style("opacity", 0);
+
   usMap.selectAll("circle")
     .transition()
       .attr("r", width * initialR)
-      .style("fill", "#FFFFFF")
-      .style("stroke", function(d){ if ( d[PEER_GROUP] ===
+      .style("fill", function(d){ if ( d[PEER_GROUP] ===
                                         CITY_DATA["$" + SELECTED_GEOID][0][PEER_GROUP] ){
-                                         return peerStroke;
-                                       } else { return strokeColor; } });
+                                         return peerCityColor;
+                                       } else { return cityColor; } });
 
   usMap.selectAll(".city-name-label")
     .remove();
 
   d3.select("#c" + SELECTED_GEOID).transition()
-      .style("fill", "#1E4586")
+      .style("fill", peerCityColor)
       .attr("r", width * largeR)
     .transition()
       .attr("r", width * hiliteR)
-      .style("stroke", "#1E4586")
 
-  d3.select("#n" + SELECTED_GEOID).append("text")
-    .text(function(d){ return d[PLACE_NAME] })
-    .attr("class", "city-name-label")
-    .attr("transform", "translate( 10, 5)");
+  resortForTable();
+}
 
-  makeTable(CITY_DATA["$" + SELECTED_GEOID][0][PEER_GROUP]);
+function headerClicked(evt){
+  SORT_THING = evt.variable;
+  resortForTable();
+}
+
+function resortForTable(){
+  var peerGroup = CITY_DATA["$" + SELECTED_GEOID][0][PEER_GROUP];
+
+  if ( SORT_THING === PLACE_NAME ){
+    NESTED_PEER_GROUPS["$" + peerGroup].sort(function(a,b){ return d3.ascending(a[SORT_THING], b[SORT_THING])})
+  } else {
+    NESTED_PEER_GROUPS["$" + peerGroup].sort(function(a,b){ return d3.descending(a[SORT_THING], b[SORT_THING])})
+  }
+
+  makeTable(peerGroup)
+
 }
 
 function makeTable(peerGroup){
@@ -182,14 +219,10 @@ function makeTable(peerGroup){
                                                   return d3.entries(peer).slice(startCol,endCol)
                                               });
 
-//move selected city to front of array and make key value pairs to get data-title
+//make key value pairs to get data-title
   for (var i = 0; i < peersForChart.length; i++){
     for ( var j = 0; j < peersForChart[i].length; j++){
       peersForChart[i][j].key = columns[j].name;
-    }
-    if ( peersForChart[i][0].value === selectedCityName ){
-      peersForChart.unshift(peersForChart[i])
-      peersForChart.splice(i +1, 1)
     }
   }
 
@@ -202,19 +235,23 @@ function makeTable(peerGroup){
       .data(columns)
       .enter()
       .append("th")
-      .text(function(d) { return d.name; });
+      .text(function(d) { return d.name; })
+      .on("click", headerClicked);
 
   var rows = tbody.selectAll("tr")
       .data(peersForChart)
       .enter()
-      .append("tr");
+      .append("tr")
+      .style("background-color", function(d){ if ( d[0].value === CITY_DATA["$" + SELECTED_GEOID][0].city){
+                                                    return hilite;
+                                                  } });;
 
   var cells = rows.selectAll("td")
       .data(function(d){ return d; })
       .enter()
       .append("td")
       .text(function(d){ return d.value; })
-      .attr("data-title", function(d){ return d.key });
+      .attr("data-title", function(d){ return d.key })
 
   pymChild.sendHeight();
 
@@ -245,13 +282,3 @@ function resize(){
     })
 
 }
-
-
-
-
-
-
-
-
-
-
